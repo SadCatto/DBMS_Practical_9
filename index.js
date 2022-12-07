@@ -4,12 +4,9 @@ const app = express();
 const { MongoClient, ServerApiVersion, Db } = require("mongodb");
 const bodyParser = require("body-parser");
 require("dotenv").config();
-
-const { Student, Marks } = require("./models/student.js");
+const { Student} = require("./models/student.js");
 const { json } = require("body-parser");
 const cors = require("cors");
-const { Console } = require("console");
-
 app.set("view engine", "ejs");
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
@@ -47,7 +44,7 @@ client.connect((err) => {
     let BDP = 0;
     let BMAP = 0;
 
-    collection.find({ section: "A" }, options).toArray(function (err, result) {
+    collection.find({ section: "A"}, options).toArray(function (err, result) {
       if (err) throw err;
       for (i = 0; i < result.length; i++) {
         ADBMS = ADBMS + result[i].dbms;
@@ -56,11 +53,11 @@ client.connect((err) => {
         ADP = ADP + result[i].dp;
         AMAP = AMAP + result[i].map;
       }
-      ADBMS = parseFloat((ADBMS / 100).toFixed(2));
-      ACN = parseFloat((ACN / 100).toFixed(2));
-      ADAA = parseFloat((ADAA / 100).toFixed(2));
-      ADP = parseFloat((ADP / 100).toFixed(2));
-      AMAP = parseFloat((AMAP / 100).toFixed(2));
+      ADBMS = parseFloat((ADBMS / result.length).toFixed(2));
+      ACN = parseFloat((ACN / result.length).toFixed(2));
+      ADAA = parseFloat((ADAA / result.length).toFixed(2));
+      ADP = parseFloat((ADP / result.length).toFixed(2));
+      AMAP = parseFloat((AMAP / result.length).toFixed(2));
       collection
         .find({ section: "B" }, options)
         .toArray(function (err, result) {
@@ -72,16 +69,15 @@ client.connect((err) => {
             BDP = BDP + result[i].dp;
             BMAP = BMAP + result[i].map;
           }
-          BDBMS = parseFloat((BDBMS / 100).toFixed(2));
-          BCN = parseFloat((BCN / 100).toFixed(2));
-          BDAA = parseFloat((BDAA / 100).toFixed(2));
-          BDP = parseFloat((BDP / 100).toFixed(2));
-          BMAP = parseFloat((BMAP / 100).toFixed(2));
+          BDBMS = parseFloat((BDBMS / result.length).toFixed(2));
+          BCN = parseFloat((BCN / result.length).toFixed(2));
+          BDAA = parseFloat((BDAA / result.length).toFixed(2));
+          BDP = parseFloat((BDP / result.length).toFixed(2));
+          BMAP = parseFloat((BMAP / result.length).toFixed(2));
           res.json([ADBMS, ACN, ADAA, ADP, AMAP, BDBMS, BCN, BDAA, BDP, BMAP]);
         });
     });
   });
-
   app.get("/student/marks/:id", (req, res, next) => {
     let id = req.params.id.toUpperCase();
     const options = {
@@ -123,14 +119,14 @@ client.connect((err) => {
       for (i = 0; i < result.length; i++) {
         Aattendence = Aattendence + result[i].attendence;
       }
-      Aattendence = parseFloat((Aattendence / 100).toFixed(2));
+      Aattendence = parseFloat((Aattendence / result.length).toFixed(2));
       collection.find({ section: "B" }, options).toArray((err, result) => {
         if (err) throw err;
         let BLength = result.length
         for (i = 0; i < result.length; i++) {
           Battendence = Battendence + result[i].attendence;
         }
-        Battendence = parseFloat((Battendence / 100).toFixed(2));
+        Battendence = parseFloat((Battendence / result.length).toFixed(2));
         res.json([Aattendence, Battendence, ALength, BLength]);
       });
     });
@@ -246,6 +242,5 @@ client.connect((err) => {
         res.render("student", { student: data[0], ID: req.params.id });
       });
   });
-  //dont add any get path below this.....except / path..
   app.listen(1500);
 });
